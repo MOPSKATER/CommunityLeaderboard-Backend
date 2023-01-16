@@ -12,6 +12,7 @@
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
     "node-steam-openid": "^1.0.1",
+    "pg-promise": "^11.0.2",
     "pug": "^3.0.2"
   }
 }
