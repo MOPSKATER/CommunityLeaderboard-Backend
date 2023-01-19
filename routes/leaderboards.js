@@ -8,7 +8,8 @@ const VSetScore = {
         apikey: Joi.string()
             .alphanum()
             .length(32)
-            .lowercase() // FIXME: not forcing to lowercase
+            .lowercase()
+            .options({convert: false})
             .required(),
         level: Joi.string()
             .valid(... dbHandler.levels)
