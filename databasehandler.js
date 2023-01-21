@@ -1,8 +1,10 @@
 const pgp = require('pg-promise')();
 const { text } = require('express');
 const {PreparedStatement: PS} = require('pg-promise');
-//const db = pgp('postgres://username:password@host:port/database');
-const db = pgp('postgres://reader:NWDMCE5xdipIjRrp@hh-pgsql-public.ebi.ac.uk:5432/pfmegrnargs');
+const cn = require('./config')
+//const db = pgp('cn');
+const db = pgp('postgres://reader:NWDMCE5xdipIjRrp@hh-pgsql-public.ebi.ac.uk:5432/pfmegrnargs'); //FIXME use config
+
 
 function getAPIKey(steamID, callback){
     db.oneOrNone(new PS({
