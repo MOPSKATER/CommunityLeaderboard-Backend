@@ -2,8 +2,7 @@ const pgp = require('pg-promise')();
 const { text } = require('express');
 const {PreparedStatement: PS} = require('pg-promise');
 const cn = require('./config')
-//const db = pgp('cn');
-const db = pgp('postgres://reader:NWDMCE5xdipIjRrp@hh-pgsql-public.ebi.ac.uk:5432/pfmegrnargs'); //FIXME use config
+const db = pgp(cn);
 
 
 function getAPIKey(steamID, callback){
