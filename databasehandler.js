@@ -94,6 +94,23 @@ function getUser(apikey, callback) {
     });
 }
 
+function createUser(steamID, callback) {
+  var apikey = makeid(64);
+  db.query(
+    new PS({
+      name: "create_user",
+      text: "INSERT INTO users (steamid, apikey) VALUES ($1, $2)",
+      values: [steamID, apikey],
+    })
+  )
+    .then((res) => {
+      callback(true, apikey);
+    })
+    .catch((err) => {
+      callback(false, err);
+    });
+}
+
 function getScore(steamID, level, callback) {
   db.oneOrNone(
     new PS({
@@ -265,7 +282,8 @@ var levels = [
 module.exports = {
   getAPIKey,
   getUser,
+  createUser,
+  getScore,
   setScore,
-
   levels,
 };
