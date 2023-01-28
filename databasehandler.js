@@ -24,27 +24,40 @@ async function init() {
         "CREATE TABLE IF NOT EXISTS " +
         level.replaceAll(" ", "_") +
         " (\
-                steamid varchar(17) NOT NULL REFERENCES users(steamid) ON DELETE CASCADE,\
-                score int NOT NULL,\
-                PRIMARY KEY (steamid)\
-                )";
+                  steamid varchar(17) NOT NULL REFERENCES users(steamid) ON DELETE CASCADE,\
+                  score int NOT NULL,\
+                  PRIMARY KEY (steamid)\
+                  )";
       db.none(query).catch((err) => {
         console.log("ERROR: " + level.replace(" ", "_") + "\n" + err);
       });
-      // db.none("DROP TABLE " + level).catch(err => {console.log(err)});
+      //   db.none("DROP TABLE " + level.replaceAll(" ", "_")).catch((err) => {
+      //     console.log(err);
+      //   });
     });
   })();
 
   // Create test data
-  // for (let i = 0; i < 100; i++) {
+  //   for (let i = 0; i < 100; i++) {
   //     var id = makeid(17);
   //     var key = makeid(64);
-  //     var query = "INSERT INTO users (steamid, apikey) VALUES ('" + id + "', '" + key + "')";
-  //     await db.none(query)
-  //     var query = "INSERT INTO TUT_MOVEMENT (steamid, score) VALUES ('" + id + "', '" + Math.floor(Math.random() * 1000000000) + "')";
-  //     db.none(query)
-  //     .catch(err => {console.log("ERROR: " + err)});
-  // }
+  //     var query =
+  //       "INSERT INTO users (steamid, apikey) VALUES ('" +
+  //       id +
+  //       "', '" +
+  //       key +
+  //       "')";
+  //     await db.none(query);
+  //     var query =
+  //       "INSERT INTO TUT_MOVEMENT (steamid, score) VALUES ('" +
+  //       id +
+  //       "', '" +
+  //       Math.floor(Math.random() * 1000000000) +
+  //       "')";
+  //     db.none(query).catch((err) => {
+  //       console.log("ERROR: " + err);
+  //     });
+  //   }
 }
 
 init();
