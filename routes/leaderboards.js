@@ -29,7 +29,7 @@ router.get("/login", async (req, res, next) => {
 router.post("/submit", validate(VSetScore), async (req, res, next) => {
     dbHandler.getUser(req.body.apikey, (succeed, result) => {
         if (!succeed){
-            next("API key does not exist");
+            res.status(404).send("Apikey not found")
             return;
         }
         dbHandler.setScore(result.steamid, req.body.level, parseInt(req.body.score), (succeed, result) => {

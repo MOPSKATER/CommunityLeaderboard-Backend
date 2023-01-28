@@ -29,7 +29,7 @@ async function init() {
                   PRIMARY KEY (steamid)\
                   )";
       db.none(query).catch((err) => {
-        console.log("ERROR: " + level.replace(" ", "_") + "\n" + err);
+        console.log(err);
       });
       //   db.none("DROP TABLE " + level.replaceAll(" ", "_")).catch((err) => {
       //     console.log(err);
