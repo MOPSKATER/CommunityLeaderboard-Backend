@@ -5,10 +5,59 @@ const cn = require('./config')
 const db = pgp(cn);
 
 
+async function init(){
+
+    await db.none("CREATE TABLE IF NOT EXISTS users (\
+        steamid varchar(17) NOT NULL,\
+        apikey varchar(64) NOT NULL,\
+        banned boolean NOT NULL DEFAULT false,\
+        PRIMARY KEY (steamid)\
+        )")
+    .catch(err => {console.log("ERROR: " + err)});
+    
+    await async function(){
+        levels.forEach(level => {
+            var query = "CREATE TABLE IF NOT EXISTS " + level.replaceAll(" ", "_") + " (\
+                steamid varchar(17) NOT NULL REFERENCES users(steamid) ON DELETE CASCADE,\
+                score int NOT NULL,\
+                PRIMARY KEY (steamid)\
+                )"
+            db.none(query)
+            .catch(err => {console.log("ERROR: " + level.replace(" ", "_") + "\n" + err)});
+            // db.none("DROP TABLE " + level).catch(err => {console.log(err)});
+        });
+    }();
+    
+    // Create test data
+    // for (let i = 0; i < 100; i++) {
+    //     var id = makeid(17);
+    //     var key = makeid(64);
+    //     var query = "INSERT INTO users (steamid, apikey) VALUES ('" + id + "', '" + key + "')";
+    //     await db.none(query)
+    //     var query = "INSERT INTO TUT_MOVEMENT (steamid, score) VALUES ('" + id + "', '" + Math.floor(Math.random() * 1000000000) + "')";
+    //     db.none(query)
+    //     .catch(err => {console.log("ERROR: " + err)});
+    // } 
+}
+
+init();
+
+function makeid(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+}
+
 function getAPIKey(steamID, callback){
     db.oneOrNone(new PS({
         name: 'get_apikey',
-        text: 'SELECT apikey FROM Users WHERE steamID = $1',
+        text: 'SELECT apikey FROM users WHERE steamid = $1',
         values: [steamID]}))
         .then(res => {callback(true, res)})
         .catch(err => {callback(false, err)});
@@ -17,29 +66,31 @@ function getAPIKey(steamID, callback){
 function getUser(apikey, callback){
     db.one(new PS({
         name: 'get_user',
-        text: 'SELECT * FROM Users WHERE apikey = $1',
+        text: 'SELECT * FROM users WHERE apikey = $1',
         values: [apikey]}))
         .then(res => {callback(true, res)})
         .catch(err => {callback(false, err)});
     }
 
-function setScore(steamID, level, time, callback){
+function setScore(steamID, level, score, callback){
     db.oneOrNone(new PS({
         name: 'get_score',
-        text: 'SELECT score WHERE steamID = $1',
+        text: 'SELECT score FROM ' + level + ' WHERE steamid = $1',
         values: [steamID]}))
         .then(res => {
-            if (res && time > res.score)
-                db.query(new PS({
-                    name: 'update_score',
-                    text: 'UPDATE $2 SET score = $3 WHERE steamID = $1',
-                    values: [steamID, level, time]
+            if (res) {
+                if (score < res.score)
+                    db.query(new PS({
+                        name: 'update_score',
+                        text: 'UPDATE ' + level + ' SET score = $2 WHERE steamid = $1',
+                        values: [steamID, score]
                 }));
+            }
             else
                 db.query(new PS({
                     name: 'insert_score',
-                    text: 'INSERT INTO $2 (steamID, time) VALUES($1, $3)',
-                    values: [steamID, level, time]
+                    text: 'INSERT INTO ' + level + ' (steamid, score) VALUES($1, $2)',
+                    values: [steamID, score]
                 }));
             callback(true, null);
         })

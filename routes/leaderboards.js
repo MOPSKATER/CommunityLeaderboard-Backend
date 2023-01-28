@@ -7,14 +7,15 @@ const VSetScore = {
     body: Joi.object({
         apikey: Joi.string()
             .alphanum()
-            .length(32)
-            .lowercase()
+            .length(64)
             .options({convert: false})
             .required(),
         level: Joi.string()
             .valid(... dbHandler.levels)
             .required(),
-        time: Joi.number()
+        score: Joi.number()
+            .integer()
+            .options({convert: true})
             .min(0)
             .max(2_147_483_647) // Max Int
             .required()
@@ -22,7 +23,7 @@ const VSetScore = {
 }
 
 router.get("/login", async (req, res, next) => {
-
+    res.sendStatus(200);
 });
 
 router.post("/submit", validate(VSetScore), async (req, res, next) => {
@@ -31,7 +32,13 @@ router.post("/submit", validate(VSetScore), async (req, res, next) => {
             next("API key does not exist");
             return;
         }
-        res.sendStatus(200);        
+        dbHandler.setScore(result.steamid, req.body.level, parseInt(req.body.score), (succeed, result) => {
+            if (!succeed){
+                next(result);
+                return;
+            }
+            res.sendStatus(200);   
+        })     
     });
 });
 
